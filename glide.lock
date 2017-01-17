@@ -1,0 +1,12 @@
+hash: fcd11e60a08e0f59cf77a2e6c88f0539d28b608c42f9a5270d57ab94cb572ea0
+updated: 2017-01-17T20:40:32.184217928+01:00
+imports:
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: b12896167c61cb7a17ee5f15c2ba0729d78793db
+- name: github.com/unrolled/render
+  version: 50716a0a853771bb36bfce61a45cdefdb98c2e6e
+- name: github.com/urfave/negroni
+  version: fde5e16d32adc7ad637e9cd9ad21d4ebc6192535
+testImports: []
