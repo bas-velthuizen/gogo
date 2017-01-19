@@ -3,13 +3,16 @@ package main
 import (
 	"net/http"
 
+	"github.com/bas-velthuizen/gogo-engine"
 	"github.com/pborman/uuid"
 
 	"github.com/unrolled/render"
 )
 
-func createMatchHandler(formatter *render.Render) http.HandlerFunc {
+func createMatchHandler(formatter *render.Render, repo matchRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+		newMatch := gogo.NewMatch(5, "Black", "White")
+		repo.addMatch(newMatch)
 		guid := uuid.New()
 		w.Header().Add("Location", "/matches/"+guid)
 
