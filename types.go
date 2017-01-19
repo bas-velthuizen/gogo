@@ -18,3 +18,8 @@ type matchRepository interface {
 	addMatch(match gogo.Match) (err error)
 	getMatches() []gogo.Match
 }
+
+type newMatchRequest struct {
+	GridSize int      `json:"gridsize"`
+	Players  []player `json:"players"`
+}

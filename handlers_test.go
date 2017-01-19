@@ -11,6 +11,7 @@ import (
 
 	"encoding/json"
 
+	"github.com/bas-velthuizen/gogo-engine"
 	"github.com/unrolled/render"
 )
 
@@ -76,6 +77,11 @@ func TestCreateMatch(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not unmarshal payload into newMatchResponse object")
 	}
+
+	if matchResponse.ID == "" || !strings.Contains(loc[0], matchResponse.ID) {
+		t.Error("matchResponse.ID does not match Location header")
+	}
+
 	if matchResponse.ID == "" || !strings.Contains(loc[0], matchResponse.ID) {
 		t.Errorf("matchResponse.ID '%s' does not match Location header '%s'", matchResponse.ID, loc[0])
 	}
@@ -85,4 +91,25 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected a match repo of 1 match, got size %d", len(matches))
 	}
 
+	var match gogo.Match
+	match = matches[0]
+	if match.GridSize != matchResponse.GridSize {
+		t.Errorf("Expected repo match and HTTP response gridsize to match. Got %d and %d", match.GridSize, matchResponse.GridSize)
+	}
+
+	if len(matchResponse.Players) != 2 {
+		t.Errorf("Match response from server should indicate two players, got %d", len(matchResponse.Players))
+	}
+
+	for _, player := range matchResponse.Players {
+		if player.Name == "alfred" {
+			if player.Color != "black" {
+				t.Errorf("Alfred's color should have been black, got %s", player.Color)
+			}
+		} else if player.Name == "bob" {
+			if player.Color != "white" {
+				t.Errorf("Bob's color should have been black, got %s", player.Color)
+			}
+		}
+	}
 }
