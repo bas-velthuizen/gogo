@@ -15,6 +15,7 @@ dev:
           cd $WERCKER_SOURCE_DIR
           go version
           go get -u github.com/Masterminds/glide
+          go get -u github.com/bas-velthuizen/gogo-engine
           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
           glide install
 
@@ -37,6 +38,7 @@ build:
           cd $WERCKER_SOURCE_DIR
           go version
           go get -u github.com/Masterminds/glide
+          go get -u github.com/bas-velthuizen/gogo-engine
           export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
           glide install
 
