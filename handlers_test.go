@@ -34,7 +34,7 @@ func TestCreateMatch(t *testing.T) {
 		http.HandlerFunc(createMatchHandler(formatter, repo)))
 	defer server.Close()
 
-	body := []byte("{\n   \"gridsize\": 19, \n  \"players\": [\n    {\n\"color\": \"white\",\n      \"name\": \"bob\"\n    },\n    {\n      \"color\": \"black\",\n      \"name\": \"alfred\"\n    }\n  ]\n}")
+	body := []byte("{\n   \"gridsize\": 19, \n  \"playerWhite\": \"bob\",\n     \"playerBlack\": \"alfred\"\n}")
 
 	req, err := http.NewRequest("POST",
 		server.URL, bytes.NewBuffer(body))
@@ -69,7 +69,6 @@ func TestCreateMatch(t *testing.T) {
 		if len(loc[0]) != len(fakeMatchLocationResult) {
 			t.Errorf("Location value does not contain guid of new match")
 		}
-
 	}
 
 	var matchResponse newMatchResponse
@@ -97,19 +96,52 @@ func TestCreateMatch(t *testing.T) {
 		t.Errorf("Expected repo match and HTTP response gridsize to match. Got %d and %d", match.GridSize, matchResponse.GridSize)
 	}
 
-	if len(matchResponse.Players) != 2 {
-		t.Errorf("Match response from server should indicate two players, got %d", len(matchResponse.Players))
+	if matchResponse.PlayerBlack != "alfred" {
+		t.Errorf("The black player should be alfred, got %s", matchResponse.PlayerBlack)
+	}
+	if matchResponse.PlayerWhite != "bob" {
+		t.Errorf("The white player should be bob, got %s", matchResponse.PlayerWhite)
+	}
+}
+
+func TestCreateMatchRespondsToBadData(t *testing.T) {
+	client := &http.Client{}
+	repo := newInMemoryRepository()
+	server := httptest.NewServer(http.HandlerFunc(createMatchHandler(formatter, repo)))
+	defer server.Close()
+
+	body1 := []byte("This is not valid JSON")
+	body2 := []byte("{\"test\":\"This is valid JSON, but doesn't conform to server expectations.\"}")
+
+	// Send invalid JSON
+	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body1))
+	if err != nil {
+		t.Errorf("Error in creating POST request for createMatchHandler: %v", err)
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		t.Errorf("Error in POST to createMatchHandler: %v", err)
 	}
 
-	for _, player := range matchResponse.Players {
-		if player.Name == "alfred" {
-			if player.Color != "black" {
-				t.Errorf("Alfred's color should have been black, got %s", player.Color)
-			}
-		} else if player.Name == "bob" {
-			if player.Color != "white" {
-				t.Errorf("Bob's color should have been black, got %s", player.Color)
-			}
-		}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusBadRequest {
+		t.Error("Sending invalid JSON should result in a BAD REQUEST from server.")
 	}
+
+	req2, err2 := http.NewRequest("POST", server.URL, bytes.NewBuffer(body2))
+	if err2 != nil {
+		t.Errorf("Error in creating POST request for invalid data for createMatchHandler: %v", err2)
+	}
+	req2.Header.Add("Content-Type", "application/json")
+	res2, err2 := client.Do(req2)
+	if err2 != nil {
+		t.Errorf("Error in POST to createMatchHandler: %v", err2)
+	}
+	defer res2.Body.Close()
+	if res2.StatusCode != http.StatusBadRequest {
+		t.Error("Sending valid JSON but with incorrect or missing fields should result in a BAD REQUEST from server.")
+	}
+
 }

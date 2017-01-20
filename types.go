@@ -3,10 +3,11 @@ package main
 import "github.com/bas-velthuizen/gogo-engine"
 
 type newMatchResponse struct {
-	ID        string   `json:"id"`
-	StartedAt int64    `json:"started_at"`
-	GridSize  int      `json:"gridsize"`
-	Players   []player `json:"players"`
+	ID          string `json:"id"`
+	StartedAt   int64  `json:"started_at"`
+	GridSize    int    `json:"gridsize"`
+	PlayerWhite string `json:"playerWhite"`
+	PlayerBlack string `json:"playerBlack"`
 }
 
 type player struct {
@@ -20,6 +21,21 @@ type matchRepository interface {
 }
 
 type newMatchRequest struct {
-	GridSize int      `json:"gridsize"`
-	Players  []player `json:"players"`
+	GridSize    int    `json:"gridsize"`
+	PlayerWhite string `json:"playerWhite"`
+	PlayerBlack string `json:"playerBlack"`
+}
+
+func (request newMatchRequest) isValid() (valid bool) {
+	valid = true
+	if request.GridSize != 19 && request.GridSize != 13 && request.GridSize != 9 {
+		valid = false
+	}
+	if request.PlayerWhite == "" {
+		valid = false
+	}
+	if request.PlayerBlack == "" {
+		valid = false
+	}
+	return valid
 }
