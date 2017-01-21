@@ -1,0 +1,9 @@
+---
+applications:    
+    - name: gogo
+    - path: .
+    - memory: 512MB
+    - instances: 1
+    - disk_quota: 1024M
+    - command: gogo
+    - buildpack: https://github.com/cloudfoundry/go-buildpack.git

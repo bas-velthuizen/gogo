@@ -2,8 +2,6 @@ package main
 
 import (
 	"os"
-
-	service "github.com/bas-velthuizen/gogo/service"
 )
 
 func main() {
@@ -12,6 +10,6 @@ func main() {
 		port = "3000"
 	}
 
-	server := service.NewServer()
+	server := NewServer()
 	server.Run(":" + port)
 }
